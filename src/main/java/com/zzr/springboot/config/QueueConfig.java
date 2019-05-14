@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * 版权：山东海豚数据技术有限公司
  * <p>
  * QueueConfig
- *
+ * 队列
  * @author zzr
  * @created Create Time: 2019/5/10
  */
