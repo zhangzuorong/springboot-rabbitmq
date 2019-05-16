@@ -124,7 +124,7 @@ public class ConnectionController {
     public String queueDelete(String queueName) throws IOException, TimeoutException {
         Connection connection = connectionConfig.getConnectionFactory().newConnection();//创建连接
         Channel channel = connection.createChannel();//创建信道
-        channel.queueDelete(queueName,false,true);
+        channel.queueDelete(queueName,false,false);
         //关闭资源
         channel.close();
         connection.close();
