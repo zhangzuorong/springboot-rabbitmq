@@ -4,9 +4,9 @@ springboot 集成rabbitmq 开箱即用
   ```
     测试例子中，交换机默认testExchange  消息队列默认testQueue
     
-    1.推消息
+    1.发送消息
     http://localhost:8667/rabbitmq/sendMsg?str=zaihello
-    2.拉消息
+    2.消费消息（有两种模式 push 和 pull 此处为push 推模式）
     http://localhost:8667/rabbitmq/getMsg
     3.删除交换机
     http://localhost:8667/rabbitmq/exchangeDelete?exchangeName=xxxxx
