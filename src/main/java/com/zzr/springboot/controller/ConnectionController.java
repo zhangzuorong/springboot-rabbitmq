@@ -33,9 +33,21 @@ public class ConnectionController {
 
         Connection connection = connectionConfig.getConnectionFactory().newConnection();//创建连接
         Channel channel = connection.createChannel();//创建信道
+        //创建一个持久化的，非自动删除的，绑定类型为direct的交换器
+        /**
+         * 参数说明
+         * exchange: 交换器的名称
+         * type: 交换器类型，eg:fanout direct topic
+         * durable: 设置是否持久化 true表示持久化，繁殖为非持久化
+         * autoDelete: 是否自动删除
+         * internal: 设置是否是内置的。
+         * argument: 其它一些结构化参数
+         */
         channel.exchangeDeclare("testExchange","direct",true,false,null);
+        //创建一个持久化，非排他，非自动删除的队列
         channel.queueDeclare("testQueue",true,false,false,null);
 
+        //使用路由键将交换器和队列绑定
         channel.queueBind("testQueue","testExchange","routingkey_demo");
 
         String msg = str;
