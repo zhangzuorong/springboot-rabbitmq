@@ -12,5 +12,7 @@ springboot 集成rabbitmq 开箱即用
     http://localhost:8667/rabbitmq/exchangeDelete?exchangeName=xxxxx
     4.删除队列
     http://localhost:8667/rabbitmq/queueDelete?queueName=xxxxxx
+    5.将已绑定的队列和交换器解绑
+    http://localhost:8667/rabbitmq/queueUnbind?queueName=testQueue&exchange=testExchange
   ```
 
