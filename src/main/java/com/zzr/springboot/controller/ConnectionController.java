@@ -1,6 +1,7 @@
 package com.zzr.springboot.controller;
 
 import com.rabbitmq.client.*;
+import java.lang.String;
 import com.zzr.springboot.config.ConnectionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -208,6 +209,25 @@ public class ConnectionController {
         channel.close();
         connection.close();
         return "发送成功,交换机为testExchange，队列为testQueue，内容为："+msg;
+    }
+
+    /**
+     * 消费消息
+     * @return
+     * @throws IOException
+     * @throws TimeoutException
+     * @throws InterruptedException
+     */
+    @RequestMapping("/getMsgTwo")
+    public String getMsgTwo() throws IOException, TimeoutException, InterruptedException {
+        Address[] addresses = new Address[]{new Address("47.95.117.206", 5672)};
+        Connection connection = connectionConfig.getConnectionFactory().newConnection(addresses);
+        final Channel channel = connection.createChannel();
+        channel.basicQos(64);//设置客户端最多接收未被ack的消息个数
+        GetResponse response = channel.basicGet("testQueue",false);
+        System.out.println(response.getBody());
+        channel.basicAck(response.getEnvelope().getDeliveryTag(),false);
+        return response.toString();
     }
 
 }
