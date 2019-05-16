@@ -8,6 +8,8 @@ springboot 集成rabbitmq 开箱即用
     http://localhost:8667/rabbitmq/sendMsg?str=zaihello
     2.消费消息（有两种模式 push 和 pull 此处为push 推模式）
     http://localhost:8667/rabbitmq/getMsg
+    2.1.消费消息（有两种模式 push 和 pull 此处为pull 拉模式）
+    http://localhost:8667/rabbitmq/getMsgTwo
     3.删除交换机
     http://localhost:8667/rabbitmq/exchangeDelete?exchangeName=xxxxx
     4.删除队列
