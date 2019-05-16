@@ -44,6 +44,14 @@ public class ConnectionController {
          * argument: 其它一些结构化参数
          */
         channel.exchangeDeclare("testExchange","direct",true,false,null);
+        /**
+         * 参数说明
+         * queue: 队列的名称
+         * durable: 设置是否持久化。 true则设置队列为持久化
+         * exclusive: 设置是否排他。 true为排他队列
+         * autoDelete: 设置是否自动删除。 true为自动删除
+         * arguments: 设置队列的其它一些参数
+         */
         //创建一个持久化，非排他，非自动删除的队列
         channel.queueDeclare("testQueue",true,false,false,null);
 
@@ -93,6 +101,34 @@ public class ConnectionController {
         channelXiaoFei.close();
         connectionXiaoFei.close();
         return StringUtils.isEmpty(result[0]) ? "无订阅消息" : "消息内容："+result[0];
+    }
+
+    /**
+     * 删除交换机
+     */
+    @RequestMapping("/exchangeDelete")
+    public String exchangeDelete(String exchangeName) throws IOException, TimeoutException {
+        Connection connection = connectionConfig.getConnectionFactory().newConnection();//创建连接
+        Channel channel = connection.createChannel();//创建信道
+        channel.exchangeDelete(exchangeName,false);
+        //关闭资源
+        channel.close();
+        connection.close();
+        return "删除交换机"+ exchangeName +"成功";
+    }
+
+    /**
+     * 删除队列
+     */
+    @RequestMapping("/queueDelete")
+    public String queueDelete(String queueName) throws IOException, TimeoutException {
+        Connection connection = connectionConfig.getConnectionFactory().newConnection();//创建连接
+        Channel channel = connection.createChannel();//创建信道
+        channel.queueDelete(queueName,false,true);
+        //关闭资源
+        channel.close();
+        connection.close();
+        return "删除"+queueName+"成功";
     }
 
 }
