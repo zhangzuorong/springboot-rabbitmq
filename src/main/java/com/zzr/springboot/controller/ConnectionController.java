@@ -300,7 +300,7 @@ public class ConnectionController {
     }
 
     /**
-     * 测试死信队列
+     * 测试死信队列(可作为延时队列使用)
      *
      */
     @RequestMapping("/setDLX")
