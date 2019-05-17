@@ -71,16 +71,38 @@ public class ConnectionController {
         /**
          * 参数说明
          * routingKey: 路由键，交换器根据路由键将消息存储到相应的队列中
+         * mandatory: 参数设置为true时，交换器无法根据自身的类型和路由键找到一个符合条件的队列，那么RabbitMQ会调用Basic.return命令将消息返回给生产者，如果未false,
+         * 出现上述情况，则消息直接被丢弃
          * props: 消息的基本属性集
          * byte[] body: 消息体，真正需要发送的消息
          */
-        channel.basicPublish("testExchange","routingkey_demo",
+        channel.basicPublish("testExchange","routingkey_demo",true,
                 MessageProperties.PERSISTENT_TEXT_PLAIN,
                 msg.getBytes());
 
+        /**
+         * 监听器
+         */
+        channel.addReturnListener(new ReturnListener() {
+            @Override
+            public void handleReturn(int replyCode, String replyText, String exchange, String routingKey,
+                                     AMQP.BasicProperties basicProperties, byte[] body) throws IOException {
+                String message = new String(body);
+                System.out.println("Basic.Return返回的结果是："+ message);
+
+                try {
+                    channel.close();
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
+                }
+                connection.close();
+            }
+        });
+
         //关闭资源
-        channel.close();
-        connection.close();
+//        channel.close();
+//        connection.close();
+
         return "发送成功,交换机为testExchange，队列为testQueue，内容为："+str;
     }
 
