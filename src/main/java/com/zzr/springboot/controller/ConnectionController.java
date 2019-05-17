@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -251,5 +253,43 @@ public class ConnectionController {
         channel.basicAck(response.getEnvelope().getDeliveryTag(),false);
         return response.toString();
     }
+
+    /**
+     * 发送消息
+     * 测试备份交换机
+     * 可以通过在声明交换器的时候添加alternate-exchange参数来实现
+     *
+     * 如果发送一条消息到normalExchange上，当路由键等于normalKey的时候,消息能正确路由到normalQueue这个队列中，如果路由健设置为其它，
+     * 消息不能被正确的路由到normalExchange绑定的任何队列上，此时就会发送给myAe,进而发送到unroutedQueue这个队列
+     *
+     * 对于备份交换器，总结了以下几种特殊情况
+     *  1：如果设置的设备交换器不存在，客户端和RabbitMQ服务端都不会有异常出现，此时消息会丢失
+     *  2：如果备份交换器没有绑定任何队列，客户端和RabbitMQ服务端都不会有异常出现，此时消息会丢失
+     *  3：如果备份交换器没有任何匹配的队列，客户端和RabbitMQ服务端都不会有异常出现，此时消息会丢失
+     *  4：如果备份交换器和mandatory参数一起使用，那么mandatory参数无效
+     */
+    @RequestMapping("/sendMsgThr")
+    public String sendMsgThr(String msg,String normalKey) throws IOException, TimeoutException {
+        Connection connection = connectionConfig.getConnectionFactory().newConnection();//创建连接
+        Channel channel = connection.createChannel();//创建信道
+        Map<String,Object> args = new HashMap<>();
+        args.put("alternate-exchange","myAe");
+        channel.exchangeDeclare("normalExchange","direct",true,false,args);
+        channel.exchangeDeclare("myAe","fanout",true,false,null);
+        channel.queueDeclare("normalQueue",true,false,false,null);
+        channel.queueBind("normalQueue","normalExchange",normalKey);
+        channel.queueDeclare("unroutedQueue",true,false,false,null);
+        channel.queueBind("unroutedQueue","myAe","");
+
+        channel.basicPublish("normalExchange","normalKey",true,
+                MessageProperties.PERSISTENT_TEXT_PLAIN,
+                msg.getBytes());
+
+        //关闭资源
+        channel.close();
+        connection.close();
+        return "发送成功。  测试代码中声明了两个交换器normalExchange，myAe，分别绑定了normalQueue和unroutedQueue两个队列，同时将myAe设置为normalExchange的备份交换器";
+    }
+
 
 }
