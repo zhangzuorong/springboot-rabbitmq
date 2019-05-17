@@ -18,5 +18,7 @@ springboot 集成rabbitmq 开箱即用
     http://localhost:8667/rabbitmq/queueUnbind?queueName=testQueue&exchange=testExchange
     6.测试交换器与交换器之间的绑定
     http://localhost:8667/rabbitmq/sendMsgTwo
+    7.测试备份交换机
+    http://localhost:8667/rabbitmq/sendMsgThr?msg=ceshi&normalKey=normalKey
   ```
 
