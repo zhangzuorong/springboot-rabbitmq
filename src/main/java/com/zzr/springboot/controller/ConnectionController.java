@@ -55,8 +55,10 @@ public class ConnectionController {
          * autoDelete: 设置是否自动删除。 true为自动删除
          * arguments: 设置队列的其它一些参数
          */
-        //创建一个持久化，非排他，非自动删除的队列
-        channel.queueDeclare("testQueue",true,false,false,null);
+        //创建一个30分钟自动删除，非排他
+        Map<String,Object> args = new HashMap<>();
+        args.put("x-expires",1800000);
+        channel.queueDeclare("testQueue",false,false,false,args);
 
         /**
          * 参数说明
@@ -116,7 +118,7 @@ public class ConnectionController {
      * @throws InterruptedException
      */
     @RequestMapping("/getMsg")
-    public String getMsg() throws IOException, TimeoutException, InterruptedException {
+    public String getMsg(String queueName) throws IOException, TimeoutException, InterruptedException {
         Address[] addresses = new Address[]{new Address("47.95.117.206",5672)};
         Connection connectionXiaoFei = connectionConfig.getConnectionFactory().newConnection(addresses);
         final Channel channelXiaoFei = connectionXiaoFei.createChannel();
@@ -151,7 +153,7 @@ public class ConnectionController {
          * exclusive: 设置消费者的其他参数
          * callback: 设置消费者的回调函数，用来处理RabbitMQ推送过来的消息，比如DefaultConsumer
          */
-        channelXiaoFei.basicConsume("testQueue",autoAck,consumer);
+        channelXiaoFei.basicConsume(queueName,autoAck,consumer);
         TimeUnit.SECONDS.sleep(5);
         channelXiaoFei.close();
         connectionXiaoFei.close();
@@ -215,18 +217,24 @@ public class ConnectionController {
         channel.exchangeDeclare("testExchangeTwo","direct",true,false,null);
         //将testExchangeTwo交换器与testExchange交换器绑定，消息从testExchangeTwo交换器转发到testExchange交换器
         channel.exchangeBind("testExchange","testExchangeTwo","routingkey_demo");
-        //创建一个持久化，非排他，非自动删除的队列
-        channel.queueDeclare("testQueue",true,false,false,null);
+        //创建一个30分钟自动删除，非排他
+        Map<String,Object> args = new HashMap<>();
+        args.put("x-expires",1800000);
+        channel.queueDeclare("testQueue",false,false,false,args);
         //使用路由键将交换器和队列绑定
         channel.queueBind("testQueue","testExchange","routingkey_demo");
 
         /**
          * * arguments: 设置队列的其它一些参数
-         * 此处设置了消息的过期时间
+         * 此处设置了消息的过期时间 单位为毫秒
          */
         String msg = "Hello World";
+        AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder();
+        builder.deliveryMode(2);//持久化消息
+        builder.expiration("6000");//设置TTL=6000ms
+        AMQP.BasicProperties properties = builder.build();
         channel.basicPublish("testExchangeTwo","routingkey_demo",
-                new AMQP.BasicProperties.Builder().expiration("6000").build(),
+                properties,
                 msg.getBytes());
 
         //关闭资源
@@ -289,6 +297,38 @@ public class ConnectionController {
         channel.close();
         connection.close();
         return "发送成功。  测试代码中声明了两个交换器normalExchange，myAe，分别绑定了normalQueue和unroutedQueue两个队列，同时将myAe设置为normalExchange的备份交换器";
+    }
+
+    /**
+     * 测试死信队列
+     *
+     */
+    @RequestMapping("/setDLX")
+    public String setDLX() throws IOException, TimeoutException {
+        Connection connection = connectionConfig.getConnectionFactory().newConnection();//创建连接
+        Channel channel = connection.createChannel();//创建信道
+        channel.exchangeDeclare("dlx.exchange","direct",true);//创建DLX
+        channel.exchangeDeclare("normal.exchange","fanout",true);
+
+        Map<String,Object> args = new HashMap<>();
+        args.put("x-message-ttl",10000);
+        args.put("x-dead-letter-exchange","dlx.exchange");//为这个队列添加DLX
+        args.put("x-dead-letter-routing-key","dlx-routing-key");
+        channel.queueDeclare("queue.normal",true,false,false ,args);
+
+        channel.queueBind("queue.normal","normal.exchange","dlx-routing-key");
+
+        channel.queueDeclare("queue.dlx",true,false,false,null);
+        channel.queueBind("queue.dlx","dlx.exchange","dlx-routing-key");
+
+        /**
+         * 生产者首先发送一条携带路由键为""的消息，然后经过normal.exchange顺利的存储到queue.normal队列中，由于queue.normal设置了过期时间
+         * ，10s内没有消费者消费这条消息，那么判定这条消息为过期，由于设置了DLX，过期之时，消息被丢弃给dlx.exchange中，这时找到与dlx.exchange匹配的队列queue.dlx
+         */
+        channel.basicPublish("normal.exchange","",
+                MessageProperties.PERSISTENT_TEXT_PLAIN,"dlx".getBytes());
+
+        return "死信队列成功";
     }
 
 
