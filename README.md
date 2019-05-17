@@ -22,7 +22,7 @@ springboot 集成rabbitmq 开箱即用，结合朱忠华老师的《RabbitMQ实�
     1.发送消息
     http://localhost:8667/rabbitmq/sendMsg?str=zaihello
     2.消费消息（有两种模式 push 和 pull 此处为push 推模式）
-    http://localhost:8667/rabbitmq/getMsg
+    http://localhost:8667/rabbitmq/getMsg?queueName=xxxx
     2.1.消费消息（有两种模式 push 和 pull 此处为pull 拉模式）
     http://localhost:8667/rabbitmq/getMsgTwo
     3.删除交换机
