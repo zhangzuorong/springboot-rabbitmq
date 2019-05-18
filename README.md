@@ -35,5 +35,7 @@ springboot 集成rabbitmq 开箱即用，结合朱忠华老师的《RabbitMQ实�
     http://localhost:8667/rabbitmq/sendMsgTwo
     7.测试备份交换机
     http://localhost:8667/rabbitmq/sendMsgThr?msg=ceshi&normalKey=normalKey
+    8.测试死信队列(可作为延时队列使用)
+    http://localhost:8667/rabbitmq/setDLX
   ```
 
