@@ -71,7 +71,6 @@ public class ConnectionController {
         channel.queueBind("testQueue","testExchange","routingkey_demo");
 
         String msg = str;
-
         /**
          * 参数说明
          * routingKey: 路由键，交换器根据路由键将消息存储到相应的队列中
@@ -85,7 +84,7 @@ public class ConnectionController {
                 msg.getBytes());
 
         /**
-         * 监听器
+         * 监听器(没有匹配到队列时触发)
          */
         channel.addReturnListener(new ReturnListener() {
             @Override
@@ -102,11 +101,6 @@ public class ConnectionController {
                 connection.close();
             }
         });
-
-        //关闭资源
-//        channel.close();
-//        connection.close();
-
         return "发送成功,交换机为testExchange，队列为testQueue，内容为："+str;
     }
 
