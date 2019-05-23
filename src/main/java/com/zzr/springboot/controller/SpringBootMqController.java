@@ -36,7 +36,7 @@ public class SpringBootMqController {
     public void send(String message) {
         String uuid = UUID.randomUUID().toString();
         CorrelationData correlationId = new CorrelationData(uuid);
-        rabbitTemplate.convertAndSend(RabbitMqConfig.EXCHANGE, RabbitMqConfig.ROUTINGKEY2,
+        rabbitTemplate.convertAndSend(RabbitMqConfig.EXCHANGE, RabbitMqConfig.ROUTINGKEY4,
                 message, correlationId);
     }
 
@@ -44,5 +44,11 @@ public class SpringBootMqController {
     public void handleMessage(String message) throws Exception {
         // 处理消息
         System.out.println("FirstConsumer {} handleMessage :"+message);
+    }
+
+    @RabbitListener(queues = {"springboot-queue-thr"}, containerFactory = "rabbitListenerContainerFactory")
+    public void dlxHandleMessage(String message) throws Exception {
+        // 处理消息
+        System.out.println("死信队列中过期的信息 发送至绑定了死信交换机的队列 FirstConsumer {} handleMessage :"+message);
     }
 }

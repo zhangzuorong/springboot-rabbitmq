@@ -4,6 +4,9 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * 开发公司：山东海豚数据技术有限公司
@@ -30,5 +33,23 @@ public class QueueConfig {
     @Bean
     public Queue secondQueue() {
         return new Queue("springboot-queue-two",true,false,false);
+    }
+
+    /**
+     * 设置springboot-queue-dlx 为死信队列
+     * @return
+     */
+    @Bean
+    public Queue dlxQueue(){
+        Map<String,Object> args = new HashMap<>();
+        args.put("x-message-ttl",10000);
+        args.put("x-dead-letter-exchange","springbootDixExchange");//为这个队列添加DLX
+        args.put("x-dead-letter-routing-key","springbootmqkey3");
+        return new Queue("springboot-queue-dlx",true,false,false,args);
+    }
+
+    @Bean
+    public Queue thrQueue() {
+        return new Queue("springboot-queue-thr",true,false,false);
     }
 }

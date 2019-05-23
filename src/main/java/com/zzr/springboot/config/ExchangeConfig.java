@@ -31,4 +31,10 @@ public class ExchangeConfig {
         DirectExchange directExchange = new DirectExchange(RabbitMqConfig.EXCHANGE,true,false);
         return directExchange;
     }
+
+    @Bean
+    public DirectExchange directDixExchange(){
+        DirectExchange directExchange = new DirectExchange(RabbitMqConfig.DIXEXCHANGE,true,false);
+        return directExchange;
+    }
 }

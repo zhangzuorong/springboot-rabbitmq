@@ -25,10 +25,15 @@ public class RabbitMqConfig {
 
     /** 交换机的名字*/
     public static final String EXCHANGE = "springbootexchange";
+    public static final String DIXEXCHANGE= "springbootDixExchange";
     /**路由键*/
     public static final String ROUTINGKEY1 = "springbootmqkey1";
     /**路由键*/
     public static final String ROUTINGKEY2 = "springbootmqkey2";
+    /**路由键*/
+    public static final String ROUTINGKEY3 = "springbootmqkey3";
+    /**路由键*/
+    public static final String ROUTINGKEY4 = "springbootmqkey4";
 
     @Autowired
     private QueueConfig queueConfig;
@@ -54,6 +59,21 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(queueConfig.secondQueue()).to(exchangeConfig.directExchange()).with(RabbitMqConfig.ROUTINGKEY2);
     }
 
+    @Bean
+    public Binding binding_dlx() {
+        return BindingBuilder.bind(queueConfig.dlxQueue()).to(exchangeConfig.directExchange()).with(RabbitMqConfig.ROUTINGKEY4);
+    }
+
+    /**
+     * 队列 springboot-queue-thr 绑定 死信交换机 springbootDixExchange
+     * @return
+     */
+    @Bean
+    public Binding binding_thr() {
+        return BindingBuilder.bind(queueConfig.thrQueue()).to(exchangeConfig.directDixExchange()).with(RabbitMqConfig.ROUTINGKEY3);
+    }
+
+
     /**
      * queue listener  观察 监听模式
      * 当有消息到达时会通知监听在对应的队列上的监听对象
@@ -62,7 +82,6 @@ public class RabbitMqConfig {
     @Bean
     public SimpleMessageListenerContainer simpleMessageListenerContainer_one(){
         SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer(connectionFactory);
-        simpleMessageListenerContainer.addQueues(queueConfig.firstQueue());//监听firstQueue队列
         simpleMessageListenerContainer.setExposeListenerChannel(true);
         simpleMessageListenerContainer.setMaxConcurrentConsumers(5);
         simpleMessageListenerContainer.setConcurrentConsumers(1);
