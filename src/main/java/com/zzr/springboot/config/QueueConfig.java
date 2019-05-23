@@ -27,7 +27,9 @@ public class QueueConfig {
          auto-delete 表示消息队列没有在使用时将被自动删除 默认是false
          exclusive  表示该消息队列是否只在当前connection生效,默认是false
          */
-        return new Queue("springboot-queue-one",true,false,false);
+        Map<String,Object> args = new HashMap<>();
+        args.put("x-expires",18000);
+        return new Queue("springboot-queue-one",false,false,false,args);
     }
 
     @Bean
