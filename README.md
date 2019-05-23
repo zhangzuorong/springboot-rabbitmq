@@ -38,4 +38,19 @@ springboot 集成rabbitmq 开箱即用，结合朱忠华老师的《RabbitMQ实�
     8.测试死信队列(可作为延时队列使用)
     http://localhost:8667/rabbitmq/setDLX
   ```
+#### 集成spring-boot-starter-amqp：
+  ```
+          <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
 
+  ```
+  ```
+  配置类共四个：
+  ExchangeConfig：交换机配置类
+  QueueConfig：   队列配置类
+  RabbitMqConfig：基本配置（连接工厂，消息队列和交换机的绑定，消息确认机制等）
+  MsgSendConfirmCallBack： 消息发送到交换机确认机制
+  交换机和队列的额外属性可参考以上测试代码配置
+  ```
