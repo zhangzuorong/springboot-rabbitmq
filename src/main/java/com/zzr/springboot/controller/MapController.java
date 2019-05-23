@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,6 +53,25 @@ public class MapController {
         System.out.println(map.get("address"));
         String resutl = jsonObject.get("message").toString()+"地址="+map.get("address");
         return resutl;
+    }
+
+    /**
+     * 关键词输入提示
+     * @param keyword 用户输入的关键词（希望获取后续提示的关键词）
+     * @param region 限制城市范围：根据城市名称限制地域范围， 如，仅获取“广州市”范围内的提示内容
+     */
+    @GetMapping("/suggestion")
+    public List<Map<String,Object>>  suggestion(String keyword,String region){
+        String url = "https://apis.map.qq.com/ws/place/v1/suggestion?region="+region+"&keyword="+keyword+"&key="+key;
+        ResponseEntity<String> results = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+        JSONObject jsonObject = JSONObject.parseObject(results.getBody());
+        if(Integer.parseInt(jsonObject.get("status").toString()) != 0){
+            String resutl = jsonObject.get("message").toString();
+            System.out.println(resutl);
+            return new ArrayList<>();
+        }
+        List<Map<String,Object>> list = (List<Map<String, Object>>) jsonObject.get("data");
+        return list;
     }
 
 }
