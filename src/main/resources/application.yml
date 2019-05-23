@@ -9,3 +9,7 @@ spring:
     publisher-confirms: true
 server:
   port: 8667
+
+
+tengxun:
+  mpKey: 7Y5BZ-7DTC3-FVN3J-3Z4X2-ROLLJ-N6B7Q
