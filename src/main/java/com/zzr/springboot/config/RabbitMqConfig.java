@@ -79,15 +79,15 @@ public class RabbitMqConfig {
      * 当有消息到达时会通知监听在对应的队列上的监听对象
      * @return
      */
-    @Bean
-    public SimpleMessageListenerContainer simpleMessageListenerContainer_one(){
-        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer(connectionFactory);
-        simpleMessageListenerContainer.setExposeListenerChannel(true);
-        simpleMessageListenerContainer.setMaxConcurrentConsumers(5);
-        simpleMessageListenerContainer.setConcurrentConsumers(1);
-        simpleMessageListenerContainer.setAcknowledgeMode(AcknowledgeMode.MANUAL); //设置确认模式手工确认
-        return simpleMessageListenerContainer;
-    }
+//    @Bean
+//    public SimpleMessageListenerContainer simpleMessageListenerContainer_one(){
+//        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer(connectionFactory);
+//        simpleMessageListenerContainer.setExposeListenerChannel(true);
+//        simpleMessageListenerContainer.setMaxConcurrentConsumers(5);
+//        simpleMessageListenerContainer.setConcurrentConsumers(1);
+//        simpleMessageListenerContainer.setAcknowledgeMode(AcknowledgeMode.MANUAL); //设置确认模式手工确认
+//        return simpleMessageListenerContainer;
+//    }
 
     /**
      * 定义rabbit template用于数据的接收和发送
