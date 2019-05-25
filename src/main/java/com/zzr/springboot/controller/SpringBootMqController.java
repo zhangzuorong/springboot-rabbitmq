@@ -48,7 +48,15 @@ public class SpringBootMqController {
 
     @RabbitListener(queues = {"springboot-queue-thr"}, containerFactory = "rabbitListenerContainerFactory")
     public void dlxHandleMessage(String message) throws Exception {
-        // 处理消息
-        System.out.println("死信队列中过期的信息 发送至绑定了死信交换机的队列 FirstConsumer {} handleMessage :"+message);
+        try{
+            int num = Integer.parseInt(message);
+            if(num%2 == 1){
+                System.out.println("死信队列中过期的信息 发送至绑定了死信交换机的队列:奇数：=="+num);
+            }else {
+                System.out.println("死信队列中过期的信息 发送至绑定了死信交换机的队列:偶数：=="+num);
+            }
+        }catch (Exception e){
+            System.out.println("不是数字");
+        }
     }
 }
