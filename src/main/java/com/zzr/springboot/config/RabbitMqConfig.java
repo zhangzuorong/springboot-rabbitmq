@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * 版权：山东海豚数据技术有限公司
  * <p>
  * RabbitMqConfig
- *
+ * SpringBootRabbitMq 绑定配置
  * @author zzr
  * @created Create Time: 2019/5/21
  */

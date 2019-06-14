@@ -13,7 +13,7 @@ import java.util.Map;
  * 版权：山东海豚数据技术有限公司
  * <p>
  * QueueConfig
- *
+ * SpringBootRabbitMq 队列配置
  * @author zzr
  * @created Create Time: 2019/5/21
  */
