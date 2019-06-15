@@ -41,12 +41,14 @@ public class CountDownLatchUtil {
                     }catch (InterruptedException e){
                         e.printStackTrace();
                     }finally {
+                        //使计数器减一
                         end.countDown();
                     }
                 }
             };
             executorService.submit(run);
         }
+        //使计数器减一
         start.countDown();
         end.await();
         executorService.shutdown();
