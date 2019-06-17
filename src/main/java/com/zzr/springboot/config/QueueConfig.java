@@ -29,7 +29,7 @@ public class QueueConfig {
          */
         Map<String,Object> args = new HashMap<>();
         args.put("x-expires",18000);
-        return new Queue("springboot-queue-one",false,false,false,args);
+        return new Queue("springboot-queue-one",true,false,false,args);
     }
 
     @Bean
