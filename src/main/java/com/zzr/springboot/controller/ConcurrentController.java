@@ -4,11 +4,12 @@ import com.zzr.springboot.util.CountDownLatchUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 开发公司：山东海豚数据技术有限公司
@@ -22,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping("/concurrent")
 public class ConcurrentController {
+    private Lock lock = new ReentrantLock();
     private static Logger log = LoggerFactory.getLogger(ConcurrentController.class);
     @Autowired
     public RestTemplate restTemplate;
@@ -33,15 +35,29 @@ public class ConcurrentController {
         CountDownLatchUtil countDownLatchUtil = new CountDownLatchUtil(Integer.parseInt(number));
         countDownLatchUtil.latch(()->{
             addNum();
-            String allUrl = "http://47.95.117.206:8667/rabbitmq/send?message="+i;
-            ResponseEntity<String> results = restTemplate.exchange(allUrl, HttpMethod.GET, null, String.class);
-            log.info(results.toString());
+//            String allUrl = "http://47.95.117.206:8667/rabbitmq/send?message="+i;
+//            ResponseEntity<String> results = restTemplate.exchange(allUrl, HttpMethod.GET, null, String.class);
+//            log.info(results.toString());
         });
         return  "成功";
     }
 
-    public synchronized void addNum(){
-        i = i + 1;
-        log.info(String.valueOf(System.currentTimeMillis())+"=="+ i);
+    public void addNum(){
+        if(lock.tryLock()){
+            try{
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                i = i + 1;
+                log.info(String.valueOf(System.currentTimeMillis())+"=="+ i);
+            }finally {
+                lock.unlock();
+            }
+        }else {
+            log.info(String.valueOf(System.currentTimeMillis())+"没有获取");
+        }
+
     }
 }
