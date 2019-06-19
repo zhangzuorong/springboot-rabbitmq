@@ -54,3 +54,51 @@ springboot 集成rabbitmq 开箱即用，结合朱忠华老师的《RabbitMQ实�
   MsgSendConfirmCallBack： 消息发送到交换机确认机制
   交换机和队列的额外属性可参考以上测试代码配置
   ```
+  
+  ### rabbitmq 集群配置（单机集群，使用docker）
+  #### 启动多个rabbitmq
+  ```
+  安装镜像省略。。。
+  docker run -d --hostname node1 --name rabbitmq1 -p 15672:15672 -p 5672:5672 -e RABBITMQ_ERLANG_COOKIE='rabbitcookie' rabbitmq:management
+  
+  docker run -d --hostname node2 --name rabbitmq2 -p 15673:15672 -p 5673:5672 --link rabbitmq1:node1 -e RABBITMQ_ERLANG_COOKIE='rabbitcookie' rabbitmq:management
+  
+  docker run -d --hostname node3 --name rabbitmq3 -p 15674:15672 -p 5674:5672 --link rabbitmq1:node1 --link rabbitmq2:node2 -e RABBITMQ_ERLANG_COOKIE='rabbitcookie' rabbitmq:management
+  参数说明：
+    -d 后台进程运行
+    hostname RabbitMQ主机名称
+    name 容器名称
+    -p port:port 本地端口:容器端口
+    -p 15672:15672 http访问端口
+    -p 5672:5672 amqp访问端口
+    多个容器之间使用“--link”连接，此属性不能少
+    Erlang Cookie值必须相同，也就是RABBITMQ_ERLANG_COOKIE参数的值必须相同
+  ```
+  #### 加入RabbitMQ节点到集群
+  ```
+  将node2节点加入node1节点的集群中：
+      docker exec -it rabbitmq2 bash
+      rabbitmqctl stop_app
+      rabbitmqctl reset
+      rabbitmqctl join_cluster --ram rabbit@node1
+      rabbitmqctl start_app
+      
+  将node3节点加入node1节点的集群中：
+    docker exec -it rabbitmq3 bash
+    rabbitmqctl stop_app
+    rabbitmqctl reset
+    rabbitmqctl join_cluster rabbit@node1
+    rabbitmqctl start_app   
+    
+   此时 node1节点和node2节点和node3节点便处于同一个集群中，可以在这两个节点上都执行 rabbitmqctl cluster_status 命令，可以看到相同的输出： 
+     [{nodes,[{disc,[rabbit@node3,rabbit@node1]},{ram,[rabbit@node2]}]},
+     {running_nodes,[rabbit@node3,rabbit@node1,rabbit@node2]},
+     {cluster_name,<<"rabbit@node1">>},
+     {partitions,[]},
+     {alarms,[{rabbit@node3,{badrpc,nodedown}},
+              {rabbit@node1,[]},
+              {rabbit@node2,[]}]}]
+    
+    注意：上面命令中 "--ram" 为设置节点为内存节点，默认不添加则表示节点为磁盘节点，rabbitmq集群中至少要有一个磁盘节点
+
+  ```
