@@ -104,5 +104,49 @@ springboot 集成rabbitmq 开箱即用，结合朱忠华老师的《RabbitMQ实�
   ```
   #### 配置RabbitMQ镜像队列
   ```
-      参考：https://www.cnblogs.com/TimeMaster/p/7069073.html
+    参考：https://www.cnblogs.com/TimeMaster/p/7069073.html
   ```
+  
+  #### 启动Haproxy
+  ```
+  docker run -d -p 9188:9188 -p 5679:5679 --name myhaproxy -v /opt/haproxy:/usr/local/etc/haproxy -d haproxy
+  ```
+  ```
+   配置文件/etc/haproxy/haproxy.cfg 内容如下
+   =======================================================================================
+    ### haproxy 监控页面地址是：http://服务器ip:9188/haproxy_status
+    listen admin_stats
+        bind *:9188
+        mode http
+        log 127.0.0.1 local3 err
+        stats refresh 60s
+        stats uri /haproxy_status
+        stats realm welcome login\ Haproxy
+        stats auth 账号:密码
+        stats hide-version
+        stats admin if TRUE
+
+    ### rabbitmq 集群配置，转发到
+    listen rabbitmq_cluster
+        bind *:5679
+        mode tcp
+        balance roundrobin
+        server rabbitnode1 服务器ip:5672 check inter 2000 rise 2 fall 3 weight 1
+        server rabbitnode2 服务器ip:5673 check inter 2000 rise 2 fall 3 weight 1
+        server rabbitnode3 服务器ip:5674 check inter 2000 rise 2 fall 3 weight 1
+    ======================================================================================
+   ```
+   
+   #### 连接haproxy
+   ```
+    spring:
+      application:
+        name: springboot-rabbitmq
+      rabbitmq:
+        host: 服务器ip
+        port: 5679 #5679为Haproxy地址  Haproxy将请求分配给rabbitmq
+        username: guest
+        password: guest
+        publisher-confirms: true
+   ```
+
