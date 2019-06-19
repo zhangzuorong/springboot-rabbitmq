@@ -102,3 +102,7 @@ springboot 集成rabbitmq 开箱即用，结合朱忠华老师的《RabbitMQ实�
     注意：上面命令中 "--ram" 为设置节点为内存节点，默认不添加则表示节点为磁盘节点，rabbitmq集群中至少要有一个磁盘节点
 
   ```
+  #### 配置RabbitMQ镜像队列
+  ```
+      参考：https://www.cnblogs.com/TimeMaster/p/7069073.html
+  ```
