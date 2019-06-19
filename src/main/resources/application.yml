@@ -3,7 +3,7 @@ spring:
     name: springboot-rabbitmq
   rabbitmq:
     host: 47.95.117.206
-    port: 5672
+    port: 5679 #5679为Haproxy地址  Haproxy将请求分配给rabbitmq
     username: guest
     password: guest
     publisher-confirms: true
